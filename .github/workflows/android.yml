@@ -1,0 +1,27 @@
+name: android-ndk
+on: [push, workflow_dispatch]
+
+jobs:
+  libindk:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { abi: arm64-v8a,   triple: aarch64-linux-android28 }
+          - { abi: armeabi-v7a, triple: armv7a-linux-androideabi28 }
+          - { abi: x86_64,      triple: x86_64-linux-android28 }
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build libindk.a
+        run: |
+          TOOL=$ANDROID_NDK_LATEST_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin
+          make libindk.a \
+            CC=$TOOL/${{ matrix.triple }}-clang \
+            AR=$TOOL/llvm-ar RANLIB=$TOOL/llvm-ranlib NM=$TOOL/llvm-nm
+          mkdir -p out/${{ matrix.abi }}
+          cp libindk.a out/${{ matrix.abi }}/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: libindk-${{ matrix.abi }}
+          path: out/${{ matrix.abi }}/libindk.a
