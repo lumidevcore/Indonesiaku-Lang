@@ -18,7 +18,8 @@ jobs:
           TOOL=$ANDROID_NDK_LATEST_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin
           make libindk.a \
             CC=$TOOL/${{ matrix.triple }}-clang \
-            AR=$TOOL/llvm-ar RANLIB=$TOOL/llvm-ranlib NM=$TOOL/llvm-nm
+            AR=$TOOL/llvm-ar RANLIB=$TOOL/llvm-ranlib NM=$TOOL/llvm-nm \
+            EXTRA_CFLAGS=-fPIC
           mkdir -p out/${{ matrix.abi }}
           cp libindk.a out/${{ matrix.abi }}/
       - uses: actions/upload-artifact@v4
